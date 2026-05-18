@@ -4,9 +4,11 @@ on:
   schedule:
     - cron: '0 12 * * *'
 
+  push:
+  workflow_dispatch:
 jobs:
   Verify:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
       - name: Grant Permission
@@ -18,8 +20,15 @@ jobs:
       - name: Verify
         run: ./mvnw -B -ntp clean verify -DskipTests -Dgpg.skip=true
 
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+      fail-fast: false
   RunOnLinux:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: Verify
     steps:
       - uses: actions/checkout@v6
@@ -32,8 +41,15 @@ jobs:
       - name: Run Tests
         run: ./mvnw -B -ntp test -Ddocker.tests=true
 
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+      fail-fast: false
   RunOnMacOs:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     needs: Verify
     steps:
       - uses: actions/checkout@v6
@@ -46,8 +62,15 @@ jobs:
       - name: Run Tests
         run: ./mvnw -B -ntp test
 
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+      fail-fast: false
   RunOnWindows:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     needs: Verify
     steps:
       - uses: actions/checkout@v6
@@ -57,3 +80,10 @@ jobs:
           java-version: '11'
       - name: Run Tests
         run: ./mvnw.cmd -B -ntp test
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+      fail-fast: false
