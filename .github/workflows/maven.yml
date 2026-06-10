@@ -6,18 +6,7 @@ permissions:
   contents: read
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-
   workflow_dispatch:
-    inputs:
-      name:
-        description: 'Github Actions'
-        required: true
-        default: 'Github Actions'
-
 jobs:
   compile-and-check:
     runs-on: ubuntu-latest
@@ -32,6 +21,8 @@ jobs:
       - name: Compile and API compatibility check
         run: ./mvnw -B -ntp clean verify -DskipTests -Dgpg.skip=true
 
+    strategy:
+      fail-fast: false
   test:
     needs: compile-and-check
     strategy:
